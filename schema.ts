@@ -136,7 +136,62 @@ export const lists: Lists = {
     },
     fields: {
       name: text(),
-      posts: relationship({ ref: 'Post.tags', many: true }),
+      posts: relationship({
+        ref: 'Post.tags',
+        many: true,
+      }),
+    },
+  }),
+  // outlets: list();
+  Shop: list({
+    ui: {
+      searchFields: ['title', 'content'],
+    },
+    fields: {
+      title: text({ validation: { isRequired: true }, isIndexed: 'unique' }),
+      content: text({
+        validation: { isRequired: true },
+        ui: { displayMode: 'textarea' },
+      }),
+      city: relationship({
+        ref: 'City.shops',
+        ui: {
+          displayMode: 'cards',
+          cardFields: ['title', 'country'],
+          inlineEdit: { fields: ['title'] },
+          linkToItem: true,
+          inlineConnect: true,
+          inlineCreate: { fields: ['title', 'country'] },
+        },
+      }),
+      category: relationship({ ref: 'Category.shops', many: false }),
+      publishedAt: timestamp({ defaultValue: { kind: 'now' } }),
+      status: select({
+        type: 'enum',
+        options: [
+          { label: 'Published', value: 'published' },
+          { label: 'Draft', value: 'draft' },
+        ],
+      }),
+    },
+  }),
+  Category: list({
+    fields: {
+      title: text({ validation: { isRequired: true }, isIndexed: 'unique' }),
+      shops: relationship({ ref: 'Shop.category', many: true }),
+    },
+  }),
+  City: list({
+    fields: {
+      title: text({ validation: { isRequired: true }, isIndexed: 'unique' }),
+      country: relationship({ ref: 'Country.cities', many: false }),
+      shops: relationship({ ref: 'Shop.city', many: true }),
+    },
+  }),
+  Country: list({
+    fields: {
+      title: text({ validation: { isRequired: true }, isIndexed: 'unique' }),
+      cities: relationship({ ref: 'City.country', many: true }),
     },
   }),
 };

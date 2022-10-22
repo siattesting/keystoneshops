@@ -56,7 +56,13 @@ input StringFilter {
   contains: String
   startsWith: String
   endsWith: String
+  mode: QueryMode
   not: NestedStringFilter
+}
+
+enum QueryMode {
+  default
+  insensitive
 }
 
 input NestedStringFilter {
@@ -171,6 +177,7 @@ input StringNullableFilter {
   contains: String
   startsWith: String
   endsWith: String
+  mode: QueryMode
   not: NestedStringNullableFilter
 }
 
@@ -303,6 +310,288 @@ input TagCreateInput {
   posts: PostRelateToManyForCreateInput
 }
 
+type Shop {
+  id: ID!
+  title: String
+  content: String
+  city: City
+  category: Category
+  publishedAt: DateTime
+  status: ShopStatusType
+}
+
+enum ShopStatusType {
+  published
+  draft
+}
+
+input ShopWhereUniqueInput {
+  id: ID
+  title: String
+}
+
+input ShopWhereInput {
+  AND: [ShopWhereInput!]
+  OR: [ShopWhereInput!]
+  NOT: [ShopWhereInput!]
+  id: IDFilter
+  title: StringFilter
+  content: StringFilter
+  city: CityWhereInput
+  category: CategoryWhereInput
+  publishedAt: DateTimeNullableFilter
+  status: ShopStatusTypeNullableFilter
+}
+
+input ShopStatusTypeNullableFilter {
+  equals: ShopStatusType
+  in: [ShopStatusType!]
+  notIn: [ShopStatusType!]
+  not: ShopStatusTypeNullableFilter
+}
+
+input ShopOrderByInput {
+  id: OrderDirection
+  title: OrderDirection
+  content: OrderDirection
+  publishedAt: OrderDirection
+  status: OrderDirection
+}
+
+input ShopUpdateInput {
+  title: String
+  content: String
+  city: CityRelateToOneForUpdateInput
+  category: CategoryRelateToOneForUpdateInput
+  publishedAt: DateTime
+  status: ShopStatusType
+}
+
+input CityRelateToOneForUpdateInput {
+  create: CityCreateInput
+  connect: CityWhereUniqueInput
+  disconnect: Boolean
+}
+
+input CategoryRelateToOneForUpdateInput {
+  create: CategoryCreateInput
+  connect: CategoryWhereUniqueInput
+  disconnect: Boolean
+}
+
+input ShopUpdateArgs {
+  where: ShopWhereUniqueInput!
+  data: ShopUpdateInput!
+}
+
+input ShopCreateInput {
+  title: String
+  content: String
+  city: CityRelateToOneForCreateInput
+  category: CategoryRelateToOneForCreateInput
+  publishedAt: DateTime
+  status: ShopStatusType
+}
+
+input CityRelateToOneForCreateInput {
+  create: CityCreateInput
+  connect: CityWhereUniqueInput
+}
+
+input CategoryRelateToOneForCreateInput {
+  create: CategoryCreateInput
+  connect: CategoryWhereUniqueInput
+}
+
+type Category {
+  id: ID!
+  title: String
+  shops(
+    where: ShopWhereInput! = {}
+    orderBy: [ShopOrderByInput!]! = []
+    take: Int
+    skip: Int! = 0
+  ): [Shop!]
+  shopsCount(where: ShopWhereInput! = {}): Int
+}
+
+input CategoryWhereUniqueInput {
+  id: ID
+  title: String
+}
+
+input CategoryWhereInput {
+  AND: [CategoryWhereInput!]
+  OR: [CategoryWhereInput!]
+  NOT: [CategoryWhereInput!]
+  id: IDFilter
+  title: StringFilter
+  shops: ShopManyRelationFilter
+}
+
+input ShopManyRelationFilter {
+  every: ShopWhereInput
+  some: ShopWhereInput
+  none: ShopWhereInput
+}
+
+input CategoryOrderByInput {
+  id: OrderDirection
+  title: OrderDirection
+}
+
+input CategoryUpdateInput {
+  title: String
+  shops: ShopRelateToManyForUpdateInput
+}
+
+input ShopRelateToManyForUpdateInput {
+  disconnect: [ShopWhereUniqueInput!]
+  set: [ShopWhereUniqueInput!]
+  create: [ShopCreateInput!]
+  connect: [ShopWhereUniqueInput!]
+}
+
+input CategoryUpdateArgs {
+  where: CategoryWhereUniqueInput!
+  data: CategoryUpdateInput!
+}
+
+input CategoryCreateInput {
+  title: String
+  shops: ShopRelateToManyForCreateInput
+}
+
+input ShopRelateToManyForCreateInput {
+  create: [ShopCreateInput!]
+  connect: [ShopWhereUniqueInput!]
+}
+
+type City {
+  id: ID!
+  title: String
+  country: Country
+  shops(
+    where: ShopWhereInput! = {}
+    orderBy: [ShopOrderByInput!]! = []
+    take: Int
+    skip: Int! = 0
+  ): [Shop!]
+  shopsCount(where: ShopWhereInput! = {}): Int
+}
+
+input CityWhereUniqueInput {
+  id: ID
+  title: String
+}
+
+input CityWhereInput {
+  AND: [CityWhereInput!]
+  OR: [CityWhereInput!]
+  NOT: [CityWhereInput!]
+  id: IDFilter
+  title: StringFilter
+  country: CountryWhereInput
+  shops: ShopManyRelationFilter
+}
+
+input CityOrderByInput {
+  id: OrderDirection
+  title: OrderDirection
+}
+
+input CityUpdateInput {
+  title: String
+  country: CountryRelateToOneForUpdateInput
+  shops: ShopRelateToManyForUpdateInput
+}
+
+input CountryRelateToOneForUpdateInput {
+  create: CountryCreateInput
+  connect: CountryWhereUniqueInput
+  disconnect: Boolean
+}
+
+input CityUpdateArgs {
+  where: CityWhereUniqueInput!
+  data: CityUpdateInput!
+}
+
+input CityCreateInput {
+  title: String
+  country: CountryRelateToOneForCreateInput
+  shops: ShopRelateToManyForCreateInput
+}
+
+input CountryRelateToOneForCreateInput {
+  create: CountryCreateInput
+  connect: CountryWhereUniqueInput
+}
+
+type Country {
+  id: ID!
+  title: String
+  cities(
+    where: CityWhereInput! = {}
+    orderBy: [CityOrderByInput!]! = []
+    take: Int
+    skip: Int! = 0
+  ): [City!]
+  citiesCount(where: CityWhereInput! = {}): Int
+}
+
+input CountryWhereUniqueInput {
+  id: ID
+  title: String
+}
+
+input CountryWhereInput {
+  AND: [CountryWhereInput!]
+  OR: [CountryWhereInput!]
+  NOT: [CountryWhereInput!]
+  id: IDFilter
+  title: StringFilter
+  cities: CityManyRelationFilter
+}
+
+input CityManyRelationFilter {
+  every: CityWhereInput
+  some: CityWhereInput
+  none: CityWhereInput
+}
+
+input CountryOrderByInput {
+  id: OrderDirection
+  title: OrderDirection
+}
+
+input CountryUpdateInput {
+  title: String
+  cities: CityRelateToManyForUpdateInput
+}
+
+input CityRelateToManyForUpdateInput {
+  disconnect: [CityWhereUniqueInput!]
+  set: [CityWhereUniqueInput!]
+  create: [CityCreateInput!]
+  connect: [CityWhereUniqueInput!]
+}
+
+input CountryUpdateArgs {
+  where: CountryWhereUniqueInput!
+  data: CountryUpdateInput!
+}
+
+input CountryCreateInput {
+  title: String
+  cities: CityRelateToManyForCreateInput
+}
+
+input CityRelateToManyForCreateInput {
+  create: [CityCreateInput!]
+  connect: [CityWhereUniqueInput!]
+}
+
 """
 The `JSON` scalar type represents JSON values as specified by [ECMA-404](http://www.ecma-international.org/publications/files/ECMA-ST/ECMA-404.pdf).
 """
@@ -330,6 +619,36 @@ type Mutation {
   updateTags(data: [TagUpdateArgs!]!): [Tag]
   deleteTag(where: TagWhereUniqueInput!): Tag
   deleteTags(where: [TagWhereUniqueInput!]!): [Tag]
+  createShop(data: ShopCreateInput!): Shop
+  createShops(data: [ShopCreateInput!]!): [Shop]
+  updateShop(where: ShopWhereUniqueInput!, data: ShopUpdateInput!): Shop
+  updateShops(data: [ShopUpdateArgs!]!): [Shop]
+  deleteShop(where: ShopWhereUniqueInput!): Shop
+  deleteShops(where: [ShopWhereUniqueInput!]!): [Shop]
+  createCategory(data: CategoryCreateInput!): Category
+  createCategories(data: [CategoryCreateInput!]!): [Category]
+  updateCategory(
+    where: CategoryWhereUniqueInput!
+    data: CategoryUpdateInput!
+  ): Category
+  updateCategories(data: [CategoryUpdateArgs!]!): [Category]
+  deleteCategory(where: CategoryWhereUniqueInput!): Category
+  deleteCategories(where: [CategoryWhereUniqueInput!]!): [Category]
+  createCity(data: CityCreateInput!): City
+  createCities(data: [CityCreateInput!]!): [City]
+  updateCity(where: CityWhereUniqueInput!, data: CityUpdateInput!): City
+  updateCities(data: [CityUpdateArgs!]!): [City]
+  deleteCity(where: CityWhereUniqueInput!): City
+  deleteCities(where: [CityWhereUniqueInput!]!): [City]
+  createCountry(data: CountryCreateInput!): Country
+  createCountries(data: [CountryCreateInput!]!): [Country]
+  updateCountry(
+    where: CountryWhereUniqueInput!
+    data: CountryUpdateInput!
+  ): Country
+  updateCountries(data: [CountryUpdateArgs!]!): [Country]
+  deleteCountry(where: CountryWhereUniqueInput!): Country
+  deleteCountries(where: [CountryWhereUniqueInput!]!): [Country]
   endSession: Boolean!
   authenticateUserWithPassword(
     email: String!
@@ -384,6 +703,38 @@ type Query {
   ): [Tag!]
   tag(where: TagWhereUniqueInput!): Tag
   tagsCount(where: TagWhereInput! = {}): Int
+  shops(
+    where: ShopWhereInput! = {}
+    orderBy: [ShopOrderByInput!]! = []
+    take: Int
+    skip: Int! = 0
+  ): [Shop!]
+  shop(where: ShopWhereUniqueInput!): Shop
+  shopsCount(where: ShopWhereInput! = {}): Int
+  categories(
+    where: CategoryWhereInput! = {}
+    orderBy: [CategoryOrderByInput!]! = []
+    take: Int
+    skip: Int! = 0
+  ): [Category!]
+  category(where: CategoryWhereUniqueInput!): Category
+  categoriesCount(where: CategoryWhereInput! = {}): Int
+  cities(
+    where: CityWhereInput! = {}
+    orderBy: [CityOrderByInput!]! = []
+    take: Int
+    skip: Int! = 0
+  ): [City!]
+  city(where: CityWhereUniqueInput!): City
+  citiesCount(where: CityWhereInput! = {}): Int
+  countries(
+    where: CountryWhereInput! = {}
+    orderBy: [CountryOrderByInput!]! = []
+    take: Int
+    skip: Int! = 0
+  ): [Country!]
+  country(where: CountryWhereUniqueInput!): Country
+  countriesCount(where: CountryWhereInput! = {}): Int
   keystone: KeystoneMeta!
   authenticatedItem: AuthenticatedItem
 }
@@ -461,11 +812,6 @@ enum KeystoneAdminUIFieldMetaItemViewFieldMode {
   edit
   read
   hidden
-}
-
-enum QueryMode {
-  default
-  insensitive
 }
 
 type KeystoneAdminUISort {
